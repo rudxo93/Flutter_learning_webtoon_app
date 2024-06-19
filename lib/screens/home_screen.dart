@@ -6,7 +6,7 @@ import '../models/webtoon_model.dart';
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
-  Future<List<WebtoonModel>> webtoons = ApiService.getTodaysToons();
+  final Future<List<WebtoonModel>> webtoons = ApiService.getTodaysToons();
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +28,22 @@ class HomeScreen extends StatelessWidget {
         future: webtoons,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return const Text('there is data!');
+            // snapshot이 데이터를 가지고 있을때만 실행되면 된다... -> future 동작이 끝나고 서버가 응답했을 때!
+            return ListView.separated(
+              // ListView.builder -> 사용자가 보는 item만 build! <-> 사용자가 볼 수 없는 아이템은 build하지 않는다. -> 앱 메모리 릭을 방지하기 위해 최적화된 방법
+              scrollDirection: Axis.horizontal, // 수평 스크롤
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) { // 만들려는 item에 itemBuild 실행
+                print(index);
+                var webtoon = snapshot.data![index];
+                return Text(webtoon.title);
+              },
+              separatorBuilder: (context, index) => const SizedBox(width: 20),
+            );
           }
-          return const Text('Loading.....');
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
