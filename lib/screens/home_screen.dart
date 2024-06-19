@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_learning_webtoon_app/services/api_service.dart';
+import 'package:flutter_learning_webtoon_app/widgets/webtoon_widget.dart';
 import '../models/webtoon_model.dart';
 
 /// const - 컴파일 전에 값을 알고있을때 사용..(Future에 요청하는 데이터 이므로 const 가 될 수 없다)
@@ -52,38 +53,15 @@ class HomeScreen extends StatelessWidget {
   ListView makeList(AsyncSnapshot<List<WebtoonModel>> snapshot) {
     return ListView.separated(
       // ListView.builder -> 사용자가 보는 item만 build! <-> 사용자가 볼 수 없는 아이템은 build하지 않는다. -> 앱 메모리 릭을 방지하기 위해 최적화된 방법
-      scrollDirection: Axis.horizontal, // 수평 스크롤
+      scrollDirection: Axis.horizontal,
+      // 수평 스크롤
       itemCount: snapshot.data!.length,
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       itemBuilder: (context, index) {
         // 만들려는 item에 itemBuild 실행
         var webtoon = snapshot.data![index];
-        return Column(
-          children: [
-            Container(
-              width: 250,
-              clipBehavior: Clip.hardEdge, // 자식의 부모 영역 침범 제어
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 15,
-                        offset: Offset(10, 10),
-                        color: Colors.black.withOpacity(0.5))
-                  ]),
-              child: Image.network(webtoon.thumb),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              webtoon.title,
-              style: TextStyle(
-                fontSize: 22,
-              ),
-            )
-          ],
-        );
+        return Webtoon(
+            title: webtoon.title, thumb: webtoon.thumb, id: webtoon.id);
       },
       separatorBuilder: (context, index) => const SizedBox(width: 40),
     );
