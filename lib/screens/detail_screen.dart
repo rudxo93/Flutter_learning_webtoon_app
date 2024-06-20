@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -21,12 +22,44 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   late Future<WebtoonDetailModel> webtoon;
   late Future<List<WebtoonEpisodeModel>> episodes;
+  late SharedPreferences prefs;
+  bool isLiked = false;
+
+  Future initPrefs() async {
+    prefs = await SharedPreferences.getInstance(); // SharedPreferences 생성
+    final likedToons = prefs.getStringList('likedToons');
+    if (likedToons != null) {
+      if (likedToons.contains(widget.id) == true){
+        setState(() {
+          isLiked = true;
+        });
+      }
+    } else {
+      await prefs.setStringList('likedToons', []);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     webtoon = ApiService.getToonById(widget.id);
     episodes = ApiService.getLatestEpisodesById(widget.id);
+    initPrefs();
+  }
+
+  onHeartTap() async {
+    final likedToons = prefs.getStringList('likedToons');
+    if(likedToons != null) {
+      if (isLiked) {
+        likedToons.remove(widget.id); // 제거
+      } else {
+        likedToons.add(widget.id); // 추가
+      }
+      await prefs.setStringList('likedToons', likedToons);
+      setState(() {
+        isLiked = !isLiked;
+      });
+    }
   }
 
   @override
@@ -34,14 +67,17 @@ class _DetailScreenState extends State<DetailScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        elevation: 2,
-        // 하단 음영
+        elevation: 2, // 하단 음영
         centerTitle: true,
-        backgroundColor: Colors.white,
-        // 배경
-        foregroundColor: Colors.green,
-        // text Color 및 좌측에 위치한 아이콘 색상도 반영
-
+        backgroundColor: Colors.white, // 배경
+        foregroundColor: Colors.green, // text Color 및 좌측에 위치한 아이콘 색상도 반영
+        actions: [
+          IconButton(onPressed: onHeartTap,
+              icon: Icon(
+                  isLiked? Icons.favorite : Icons.favorite_outline
+              ),
+          ),
+        ],
         title: Text(
           widget.title,
           style: const TextStyle(fontSize: 24),
