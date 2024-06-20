@@ -53,7 +53,7 @@ class HomeScreen extends StatelessWidget {
   ListView makeList(AsyncSnapshot<List<WebtoonModel>> snapshot) {
     return ListView.separated(
       // ListView.builder -> 사용자가 보는 item만 build! <-> 사용자가 볼 수 없는 아이템은 build하지 않는다. -> 앱 메모리 릭을 방지하기 위해 최적화된 방법
-      scrollDirection: Axis.horizontal,
+      scrollDirection: Axis.vertical,
       // 수평 스크롤
       itemCount: snapshot.data!.length,
       padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
